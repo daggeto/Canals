@@ -36,11 +36,6 @@ public class PathDistanceVisitor implements NodeVisitor<Integer> {
 
     @Override
     public VisitStatus visit(GraphNode node, GraphNode parent, Integer depth, boolean visited) {
-        //if there is no more target nodes then set exist flag true and stop graph processing
-        if(targetPath.isEmpty()){
-            exists = true;
-            return VisitStatus.STOP;
-        }
 
         //if visited node depth is same as observable depth of target and this node from target path
         if(depth.equals(currentDepth) && node.getName().equals(targetPath.peek())){
@@ -71,11 +66,10 @@ public class PathDistanceVisitor implements NodeVisitor<Integer> {
 
     @Override
     public Integer getResult() {
-
-        if(!exists){
+        //if there still target nodes then then path not exists
+        if(!targetPath.isEmpty()){
             return 0;
         }
-
         return distance;
     }
 

@@ -1,13 +1,18 @@
 package com.daggeto.canals.controller;
 
 
+import com.daggeto.canals.controller.adapter.CollectionAdapter;
 import com.daggeto.canals.controller.adapter.impl.BreadthFirstAdapter;
+import com.daggeto.canals.controller.adapter.impl.DepthFirstAdapter;
 import com.daggeto.canals.controller.dto.GraphNodeDto;
 import com.daggeto.canals.controller.impl.IterativeGraphTravelStrategy;
 import com.daggeto.canals.controller.impl.RecursiveGraphTravelStrategy;
 import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.utils.GraphRelationsBuilder;
+import com.daggeto.canals.visitor.NodeVisitor;
 import com.daggeto.canals.visitor.impl.PathDistanceVisitor;
+import com.daggeto.canals.visitor.impl.TripCountVisitor;
+import com.google.common.base.Predicate;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
@@ -20,8 +25,8 @@ public class GraphController {
 
     private List<GraphNode> nodes;
 
-    IterativeGraphTravelStrategy iterativeStrategy;
-    RecursiveGraphTravelStrategy recursiveStrategy;
+    private CollectionAdapter<GraphNodeDto> dfs = new DepthFirstAdapter<GraphNodeDto>();
+    private CollectionAdapter<GraphNodeDto> bfs = new BreadthFirstAdapter<GraphNodeDto>();
 
     public GraphController(){
         nodes = new ArrayList<GraphNode>();
@@ -47,16 +52,21 @@ public class GraphController {
         return node;
     }
 
+    /**
+     * Finds length of path
+     * @param path Path that need to be found
+     * @return Total weight of path
+     */
     public Integer findPath(String path){
 
-        String[] splitPath = StringUtils.split(path);
+        String[] splitPath = StringUtils.split(path,"-");
 
         Queue<String> targetPath = new LinkedList<String>();
         targetPath.addAll(Arrays.asList(splitPath));
 
-        PathDistanceVisitor pathDistanceVisitor = new PathDistanceVisitor(targetPath);
+        NodeVisitor<Integer> pathDistanceVisitor = new PathDistanceVisitor(targetPath);
 
-        iterativeStrategy = new IterativeGraphTravelStrategy(new BreadthFirstAdapter<GraphNodeDto>());
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(bfs);
 
         GraphNode startNode = findNodeByName(targetPath.peek());
 
@@ -64,9 +74,54 @@ public class GraphController {
             throw new IllegalArgumentException("Start node " + targetPath.peek() + " from " + path + " does not exists");
         }
 
-        iterativeStrategy.travel(startNode, pathDistanceVisitor);
+        strategy.travel(startNode, pathDistanceVisitor);
 
         return pathDistanceVisitor.getResult();
+    }
+
+    /**
+     * Calculates number of trips from starting node to ending node with stops less or equal to passed number
+     * @param from Node from
+     * @param to Node to
+     * @param stops Number of stops
+     * @return
+     */
+    public int countTripsWithLessOrEqualStops(String from, String to, final int stops){
+        NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer steps) {
+                return steps <= stops;
+            }
+        });
+
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(dfs);
+
+        strategy.travel(findNodeByName(from), visitor);
+
+        return visitor.getResult();
+    }
+
+    /**
+     * Calculates number of trips from starting node to ending node with stops equal to passed number
+     * @param from Node from
+     * @param to Node to
+     * @param stops Number of stops
+     * @return
+     */
+    public int countTripsWithLimitStops(String from, String to, final int stops){
+
+        NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer steps) {
+                return steps == stops;
+            }
+        });
+
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(dfs);
+
+        strategy.travel(findNodeByName(from), visitor);
+
+        return visitor.getResult();
     }
 
     private List<String> parsePathToList(String path){
