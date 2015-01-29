@@ -112,8 +112,8 @@ public class GraphController {
 
         NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, new Predicate<Integer>() {
             @Override
-            public boolean apply(Integer steps) {
-                return steps == stops;
+            public boolean apply(Integer step) {
+                return step == stops;
             }
         });
 

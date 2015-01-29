@@ -64,16 +64,10 @@ public class TripCountVisitor implements NodeVisitor<Integer> {
 
         int currentDepth = getCurrentDepth(depth);
 
-        //skip further travel if criteria doesn't met
-        if(!criteria.apply(currentDepth)){
-            return VisitStatus.SKIP;
-        }
-
-        //inc number of founded trips and skips further visiting
+        //inc number of founded trips
         //if visited node is in higher depth from start node and equals to stop node
-        if(currentDepth > 0 && stopNode.equals(node.getName())){
+        if(criteria.apply(currentDepth) && currentDepth > 0 && stopNode.equals(node.getName())){
             count++;
-            return VisitStatus.SKIP;
         }
 
         return VisitStatus.CONTINUE;
