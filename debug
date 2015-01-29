@@ -1,0 +1,2 @@
+#!/bin/bash
+java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8008 -jar target/Canals-jar-with-dependencies.jar

@@ -1,6 +1,7 @@
 package com.daggeto.canals.visitor;
 
 import com.daggeto.canals.domain.GraphNode;
+import com.daggeto.canals.utils.GraphRelationsBuilder;
 import com.daggeto.canals.visitor.impl.PathDistanceVisitor;
 import junit.framework.TestCase;
 
@@ -25,9 +26,8 @@ public class PathDistanceVisitorTest extends TestCase {
         GraphNode nodeB = new GraphNode("B");
         GraphNode nodeC = new GraphNode("C");
 
-        nodeA.addAdjacentNode(nodeB, 2);
-
-        nodeB.addAdjacentNode(nodeC, 3);
+        GraphRelationsBuilder.forNode(nodeA).withAdjacent(nodeB, 2);
+        GraphRelationsBuilder.forNode(nodeB).withAdjacent(nodeC, 3);
 
         Queue<String> pathStack = new LinkedList<>();
         pathStack.addAll(Arrays.asList("A", "B", "C"));

@@ -10,7 +10,9 @@ import com.daggeto.canals.controller.impl.RecursiveGraphTravelStrategy;
 import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.utils.GraphRelationsBuilder;
 import com.daggeto.canals.visitor.NodeVisitor;
+import com.daggeto.canals.visitor.impl.AllPathsVisitor;
 import com.daggeto.canals.visitor.impl.PathDistanceVisitor;
+import com.daggeto.canals.visitor.impl.ShortestRouteVisitor;
 import com.daggeto.canals.visitor.impl.TripCountVisitor;
 import com.google.common.base.Predicate;
 import org.apache.commons.lang.StringUtils;
@@ -24,9 +26,6 @@ import java.util.*;
 public class GraphController {
 
     private List<GraphNode> nodes;
-
-    private CollectionAdapter<GraphNodeDto> dfs = new DepthFirstAdapter<GraphNodeDto>();
-    private CollectionAdapter<GraphNodeDto> bfs = new BreadthFirstAdapter<GraphNodeDto>();
 
     public GraphController(){
         nodes = new ArrayList<GraphNode>();
@@ -66,7 +65,7 @@ public class GraphController {
 
         NodeVisitor<Integer> pathDistanceVisitor = new PathDistanceVisitor(targetPath);
 
-        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(bfs);
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(new BreadthFirstAdapter<GraphNodeDto>());
 
         GraphNode startNode = findNodeByName(targetPath.peek());
 
@@ -87,14 +86,24 @@ public class GraphController {
      * @return
      */
     public int countTripsWithLessOrEqualStops(String from, String to, final int stops){
-        NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, new Predicate<Integer>() {
+
+        Predicate<Integer> TARGET = new Predicate<Integer>() {
             @Override
             public boolean apply(Integer steps) {
                 return steps <= stops;
             }
-        });
+        };
 
-        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(dfs);
+        Predicate<Integer> LIMIT = new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer steps) {
+                return steps > stops;
+            }
+        };
+
+        NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, TARGET, LIMIT);
+
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(new DepthFirstAdapter<GraphNodeDto>());
 
         strategy.travel(findNodeByName(from), visitor);
 
@@ -110,14 +119,55 @@ public class GraphController {
      */
     public int countTripsWithLimitStops(String from, String to, final int stops){
 
-        NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, new Predicate<Integer>() {
+        Predicate<Integer> TARGET = new Predicate<Integer>() {
             @Override
             public boolean apply(Integer step) {
                 return step == stops;
             }
-        });
+        };
 
-        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(dfs);
+        Predicate<Integer> LIMIT = new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer step) {
+                return step > stops;
+            }
+        };
+
+        NodeVisitor<Integer> visitor = new TripCountVisitor(from, to, TARGET, LIMIT);
+
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(new DepthFirstAdapter<GraphNodeDto>());
+
+        strategy.travel(findNodeByName(from), visitor);
+
+        return visitor.getResult();
+    }
+
+    /**
+     * The length of the shortest route
+     * @param from Node from
+     * @param to Node to
+     * @return The length of the shortest route
+     */
+    public Integer findShortestRoute(String from, String to){
+
+        NodeVisitor<Integer> visitor = new ShortestRouteVisitor(from, to);
+        GraphTravelStrategy strategy = new IterativeGraphTravelStrategy(new BreadthFirstAdapter<GraphNodeDto>());
+
+        strategy.travel(findNodeByName(from), visitor);
+
+        return visitor.getResult();
+    }
+
+    public Integer findNumberOfRoutesWithDistanceLessThan(String from, String to, final int distance){
+        Predicate<Integer> LIMIT = new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer weight) {
+                return weight < distance;
+            }
+        };
+
+        NodeVisitor<Integer> visitor = new AllPathsVisitor(from, to, LIMIT);
+        GraphTravelStrategy strategy = new RecursiveGraphTravelStrategy();
 
         strategy.travel(findNodeByName(from), visitor);
 

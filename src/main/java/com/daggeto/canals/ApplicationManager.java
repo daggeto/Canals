@@ -80,6 +80,15 @@ public class ApplicationManager {
 
         result = controller.countTripsWithLimitStops("A", "C", 4);
         printResultString(7, result);
+
+        result = controller.findShortestRoute("A", "C");
+        printResultString(8, result);
+
+        result = controller.findShortestRoute("B", "B");
+        printResultString(9, result);
+
+        result = controller.findNumberOfRoutesWithDistanceLessThan("C", "C", 30);
+        printResultString(10, result);
     }
 
     private void printResultString(int number, Integer result) {

@@ -25,11 +25,6 @@ public class PathDistanceVisitor implements NodeVisitor<Integer> {
      */
     private int distance = 0;
 
-    /**
-     * Flag indicates that path is already founded
-     */
-    private Boolean exists = false;
-
     public PathDistanceVisitor(Queue<String> stringQueue){
         targetPath = stringQueue;
     }
@@ -46,6 +41,11 @@ public class PathDistanceVisitor implements NodeVisitor<Integer> {
 
             targetPath.remove();
             return VisitStatus.CONTINUE;
+        }
+
+        //stop travel when in target path is no more nodes to search
+        if(targetPath.isEmpty()){
+            return VisitStatus.STOP;
         }
 
         return VisitStatus.SKIP;

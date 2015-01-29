@@ -103,7 +103,7 @@ public class ShortestRouteVisitor implements NodeVisitor<Integer> {
         Comparator<GraphNode> comparator = new Comparator<GraphNode>() {
             @Override
             public int compare(GraphNode node1, GraphNode node2) {
-                return weightMap.get(node1) - weightMap.get(node2);
+                return weightMap.get(node2) - weightMap.get(node1);
             }
         };
 

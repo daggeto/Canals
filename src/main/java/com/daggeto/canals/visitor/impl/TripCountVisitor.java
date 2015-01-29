@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Counts number of trips between start and stop nodes where number of stops that met criteria
+ * Counts number of trips between start and stop nodes where number of stops that met targetCriteria
  */
 public class TripCountVisitor implements NodeVisitor<Integer> {
 
@@ -28,18 +28,21 @@ public class TripCountVisitor implements NodeVisitor<Integer> {
     private String startNode;
     private String stopNode;
 
-    private Predicate<Integer> criteria;
+    private Predicate<Integer> targetCriteria;
+    private Predicate<Integer> skipCriteria;
 
     /**
      *
      * @param startNode Node from which counting starts
      * @param stopNode Node where counting must be stopped
-     * @param criteria Criteria to compare number of stops in observable path
+     * @param targetCriteria Criteria that must be met when travel reach target
+     * @param skipCriteria Criteria that skips further travel
      */
-    public TripCountVisitor(String startNode, String stopNode, Predicate<Integer> criteria) {
+    public TripCountVisitor(String startNode, String stopNode, Predicate<Integer> targetCriteria, Predicate<Integer> skipCriteria) {
         this.startNode = startNode;
         this.stopNode = stopNode;
-        this.criteria = criteria;
+        this.targetCriteria = targetCriteria;
+        this.skipCriteria = skipCriteria;
     }
 
     @Override
@@ -64,9 +67,14 @@ public class TripCountVisitor implements NodeVisitor<Integer> {
 
         int currentDepth = getCurrentDepth(depth);
 
+        //skip further travel in this path
+        if(skipCriteria.apply(currentDepth)){
+            return VisitStatus.SKIP;
+        }
+
         //inc number of founded trips
         //if visited node is in higher depth from start node and equals to stop node
-        if(criteria.apply(currentDepth) && currentDepth > 0 && stopNode.equals(node.getName())){
+        if(targetCriteria.apply(currentDepth) && currentDepth > 0 && stopNode.equals(node.getName())){
             count++;
         }
 
@@ -79,8 +87,8 @@ public class TripCountVisitor implements NodeVisitor<Integer> {
     }
 
     /**
-     * Number of founded trip between start and stop nodes that met special criteria
-     * @return Number of founded trip between start and stop nodes that met special criteria
+     * Number of founded trip between start and stop nodes that met special targetCriteria
+     * @return Number of founded trip between start and stop nodes that met special targetCriteria
      */
     @Override
     public Integer getResult() {

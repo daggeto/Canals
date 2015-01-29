@@ -21,13 +21,21 @@ public class TripCountVisitorTest extends TestCase {
         GraphNode nodeA = new GraphNode("A");
         GraphNode nodeC = new GraphNode("C");
 
-        testObject = new TripCountVisitor("C", "C", new Predicate<Integer>() {
+        Predicate<Integer> TARGET = new Predicate<Integer>() {
             @Override
             public boolean apply(Integer steps) {
                 return steps <= LIMIT_STEPS;
             }
-        }
-        );
+        };
+
+        Predicate<Integer> LIMIT = new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer steps) {
+                return steps > LIMIT_STEPS;
+            }
+        };
+
+        testObject = new TripCountVisitor("C", "C", TARGET, LIMIT);
 
         VisitStatus status = testObject.visit(nodeA, null,  0, false);
         assertEquals(VisitStatus.CONTINUE, status);
@@ -36,7 +44,7 @@ public class TripCountVisitorTest extends TestCase {
         assertEquals(VisitStatus.CONTINUE, status);
 
         status = testObject.visit(nodeC, null, 2, false);
-        assertEquals(VisitStatus.SKIP, status);
+        assertEquals(VisitStatus.CONTINUE, status);
 
         status = testObject.visit(nodeC,null, LIMIT_STEPS + 2, false);
         assertEquals(VisitStatus.SKIP, status);
