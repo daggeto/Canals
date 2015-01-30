@@ -7,62 +7,64 @@ import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.visitor.NodeVisitor;
 import com.daggeto.canals.visitor.NodeVisitor.VisitStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of iterative graph traversal strategy.
  */
 public class IterativeGraphTravelStrategy implements GraphTravelStrategy {
 
-    CollectionAdapter<GraphNodeDto> collectionAdapter;
+  CollectionAdapter<GraphNodeDto> collectionAdapter;
 
-    Set<GraphNode> visited = new HashSet<>();
+  Set<GraphNode> visited = new HashSet<>();
 
-    public IterativeGraphTravelStrategy(CollectionAdapter<GraphNodeDto> collectionAdapter) {
-        this.collectionAdapter = collectionAdapter;
+  public IterativeGraphTravelStrategy(CollectionAdapter<GraphNodeDto> collectionAdapter) {
+    this.collectionAdapter = collectionAdapter;
+  }
+
+  @Override
+  public void travel(GraphNode root, NodeVisitor visitor) {
+
+    if (collectionAdapter == null) {
+      throw new IllegalArgumentException("CollectionAdapter must be defined with constructor");
     }
 
-    @Override
-    public void travel(GraphNode root, NodeVisitor visitor) {
+    collectionAdapter.add(new GraphNodeDto(root, null, 0));
 
-        if(collectionAdapter == null){
-            throw new IllegalArgumentException("CollectionAdapter must be defined with constructor");
-        }
+    while (collectionAdapter.hasNext()) {
+      GraphNodeDto currentNodeDto = collectionAdapter.takeNext();
 
-        collectionAdapter.add(new GraphNodeDto(root, null, 0));
+      VisitStatus status = visitor.visit(
+        currentNodeDto.node,
+        currentNodeDto.parent,
+        currentNodeDto.depth,
+        visited.contains(currentNodeDto.node)
+      );
 
-        while( collectionAdapter.hasNext() ){
+      if (VisitStatus.SKIP.equals(status)) {
+        continue;
+      }
 
-            GraphNodeDto currentNodeDto = collectionAdapter.takeNext();
+      if (VisitStatus.STOP.equals(status)) {
+        break;
+      }
 
-            VisitStatus status = visitor.visit(
-                    currentNodeDto.node,
-                    currentNodeDto.parent,
-                    currentNodeDto.depth,
-                    visited.contains(currentNodeDto.node)
-            );
+      visited.add(currentNodeDto.node);
 
-            if(VisitStatus.SKIP.equals(status)){
-                continue;
-            }
+      Set<GraphNode> adjacentNodes = currentNodeDto.node.getAdjacentNodes().keySet();
+      List<GraphNode> nodeList = new ArrayList<>(adjacentNodes);
 
-            if(VisitStatus.STOP.equals(status)){
-                break;
-            }
+      visitor.orderAdjacentNodes(nodeList, currentNodeDto.node.getAdjacentNodes());
 
-            visited.add(currentNodeDto.node);
+      for (GraphNode adjacentNode : nodeList) {
+        Integer weight = currentNodeDto.node.getAdjacentNodes().get(adjacentNode);
 
-            Set<GraphNode> adjacentNodes = currentNodeDto.node.getAdjacentNodes().keySet();
-            List<GraphNode> nodeList = new ArrayList<>(adjacentNodes);
+        collectionAdapter.add(new GraphNodeDto(adjacentNode, currentNodeDto.node, currentNodeDto.depth + 1));
+      }
 
-            visitor.orderAdjacentNodes(nodeList, currentNodeDto.node.getAdjacentNodes());
-
-            for( GraphNode adjacentNode : nodeList){
-                Integer weight = currentNodeDto.node.getAdjacentNodes().get(adjacentNode);
-
-                collectionAdapter.add(new GraphNodeDto(adjacentNode, currentNodeDto.node, currentNodeDto.depth + 1));
-            }
-
-        }
     }
+  }
 }

@@ -5,9 +5,9 @@ package com.daggeto.canals;
  */
 public class Main {
 
-    private static ApplicationManager app = new ApplicationManager();
+  private static ApplicationManager app = new ApplicationManager();
 
-    public static void main(String [] args){
-        app.start();
-    }
+  public static void main(String[] args) {
+    app.start();
+  }
 }

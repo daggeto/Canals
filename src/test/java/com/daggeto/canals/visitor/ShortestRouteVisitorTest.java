@@ -13,84 +13,91 @@ import static com.daggeto.canals.visitor.NodeVisitor.VisitStatus;
 
 public class ShortestRouteVisitorTest extends AbstractGraphTest {
 
-    NodeVisitor<Integer> testObject;
+  NodeVisitor<Integer> testObject;
 
-    GraphNode nodeA = new GraphNode("A");
-    GraphNode nodeB = new GraphNode("B");
-    GraphNode nodeC = new GraphNode("C");
-    GraphNode nodeD = new GraphNode("D");
+  GraphNode nodeA = new GraphNode("A");
+  GraphNode nodeB = new GraphNode("B");
+  GraphNode nodeC = new GraphNode("C");
+  GraphNode nodeD = new GraphNode("D");
 
-    public void testRoutBetweenDifferentNodes(){
-        addAdjacentNodes(nodeA, nodeB, 3, nodeC, 2, nodeD, 5);
-        addAdjacentNodes(nodeB, nodeD, 3);
-        addAdjacentNodes(nodeC, nodeD, 2);
+  public void testRoutBetweenDifferentNodes() {
+    GraphRelationsBuilder.forNode(nodeA).
+      withAdjacent(nodeB, 3).
+      withAdjacent(nodeC, 2).
+      withAdjacent(nodeD, 5);
 
-        testObject = new ShortestRouteVisitor("A", "D");
+    GraphRelationsBuilder.forNode(nodeB).
+      withAdjacent(nodeD, 3);
 
-        VisitStatus status = testObject.visit(nodeB, null, 0, false);
-        assertEquals(VisitStatus.CONTINUE, status);
+    GraphRelationsBuilder.forNode(nodeC).
+      withAdjacent(nodeD, 2);
 
-        status = testObject.visit(nodeA, null, 0, false);
-        assertEquals(VisitStatus.CONTINUE, status);
+    testObject = new ShortestRouteVisitor("A", "D");
 
-        status = testObject.visit(nodeB, nodeA, 0, false);
-        assertEquals(VisitStatus.CONTINUE, status);
+    VisitStatus status = testObject.visit(nodeB, null, 0, false);
+    assertEquals(VisitStatus.CONTINUE, status);
 
-        status = testObject.visit(nodeD, nodeA, 0, false);
-        assertEquals(VisitStatus.CONTINUE, status);
+    status = testObject.visit(nodeA, null, 0, false);
+    assertEquals(VisitStatus.CONTINUE, status);
 
-        status = testObject.visit(nodeC, nodeA, 0, false);
-        assertEquals(VisitStatus.CONTINUE, status);
+    status = testObject.visit(nodeB, nodeA, 0, false);
+    assertEquals(VisitStatus.CONTINUE, status);
 
-        status = testObject.visit(nodeD, nodeB, 0, true);
-        assertEquals(VisitStatus.SKIP, status);
+    status = testObject.visit(nodeD, nodeA, 0, false);
+    assertEquals(VisitStatus.CONTINUE, status);
 
-        status = testObject.visit(nodeD, nodeC, 0, true);
-        assertEquals(VisitStatus.SKIP, status);
+    status = testObject.visit(nodeC, nodeA, 0, false);
+    assertEquals(VisitStatus.CONTINUE, status);
 
-        Integer result = testObject.getResult();
-        assertEquals(Integer.valueOf(4), result);
-    }
+    status = testObject.visit(nodeD, nodeB, 0, true);
+    assertEquals(VisitStatus.SKIP, status);
 
-    public void testRouteBetweenSameNodes(){
-        GraphRelationsBuilder.forNode(nodeA)
-                .withAdjacent(nodeC, 2)
-                .withAdjacent(nodeD, 5);
+    status = testObject.visit(nodeD, nodeC, 0, true);
+    assertEquals(VisitStatus.SKIP, status);
 
-        GraphRelationsBuilder.forNode(nodeB)
-                .withAdjacent(nodeA, 2);
+    Integer result = testObject.getResult();
+    assertEquals(Integer.valueOf(4), result);
+  }
 
-        GraphRelationsBuilder.forNode(nodeC)
-                .withAdjacent(nodeD, 2);
+  public void testRouteBetweenSameNodes() {
+    GraphRelationsBuilder.forNode(nodeA)
+      .withAdjacent(nodeC, 2)
+      .withAdjacent(nodeD, 5);
 
-        GraphRelationsBuilder.forNode(nodeD)
-                .withAdjacent(nodeB, 3);
+    GraphRelationsBuilder.forNode(nodeB)
+      .withAdjacent(nodeA, 2);
 
-        testObject = new ShortestRouteVisitor("A", "A");
+    GraphRelationsBuilder.forNode(nodeC)
+      .withAdjacent(nodeD, 2);
 
-        testObject.visit(nodeA, null, 0, false);
-        testObject.visit(nodeC, nodeA, 0, false);
-        testObject.visit(nodeD, nodeC, 0, false);
-        testObject.visit(nodeB, nodeD, 0, false);
-        testObject.visit(nodeA, nodeB, 0, true);
-        testObject.visit(nodeD, nodeA, 0, true);
+    GraphRelationsBuilder.forNode(nodeD)
+      .withAdjacent(nodeB, 3);
 
-        Integer result = testObject.getResult();
+    testObject = new ShortestRouteVisitor("A", "A");
 
-        assertEquals(Integer.valueOf(9), result);
-    }
+    testObject.visit(nodeA, null, 0, false);
+    testObject.visit(nodeC, nodeA, 0, false);
+    testObject.visit(nodeD, nodeC, 0, false);
+    testObject.visit(nodeB, nodeD, 0, false);
+    testObject.visit(nodeA, nodeB, 0, true);
+    testObject.visit(nodeD, nodeA, 0, true);
 
-    public void testOrderBy(){
-        testObject = new ShortestRouteVisitor("A", "A");
+    Integer result = testObject.getResult();
 
-        GraphRelationsBuilder.forNode(nodeA)
-                .withAdjacent(nodeB, 5)
-                .withAdjacent(nodeC,1)
-                .withAdjacent(nodeD, 3);
+    assertEquals(Integer.valueOf(9), result);
+  }
 
-        Set<GraphNode> adjacentNodes = nodeA.getAdjacentNodes().keySet();
-        List<GraphNode> nodeList = new ArrayList<>(adjacentNodes);
+  public void testOrderBy() {
+    testObject = new ShortestRouteVisitor("A", "A");
 
-        testObject.orderAdjacentNodes(nodeList, nodeA.getAdjacentNodes());
-    }
+    GraphRelationsBuilder.forNode(nodeA).
+      withAdjacent(nodeB, 5).
+      withAdjacent(nodeC, 1).
+      withAdjacent(nodeD, 3);
+
+    Set<GraphNode> adjacentNodes = nodeA.getAdjacentNodes().keySet();
+    List<GraphNode> nodeList = new ArrayList<>(adjacentNodes);
+
+    testObject.orderAdjacentNodes(nodeList, nodeA.getAdjacentNodes());
+  }
 }

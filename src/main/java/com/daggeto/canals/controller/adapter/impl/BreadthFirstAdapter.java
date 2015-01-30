@@ -10,33 +10,33 @@ import java.util.Queue;
  */
 public class BreadthFirstAdapter<T> implements CollectionAdapter<T> {
 
-    private Queue<T> queue;
+  private Queue<T> queue;
 
-    public BreadthFirstAdapter() {
-        this.queue = new LinkedList<T>();
-    }
+  public BreadthFirstAdapter() {
+    this.queue = new LinkedList<T>();
+  }
 
-    public BreadthFirstAdapter(Queue<T> queue) {
-        this.queue = queue;
-    }
+  public BreadthFirstAdapter(Queue<T> queue) {
+    this.queue = queue;
+  }
 
-    @Override
-    public void add(T t) {
-        queue.add(t);
-    }
+  @Override
+  public void add(T t) {
+    queue.add(t);
+  }
 
-    @Override
-    public T takeNext() {
-        return queue.remove();
-    }
+  @Override
+  public T takeNext() {
+    return queue.remove();
+  }
 
-    @Override
-    public boolean hasNext() {
-        return !queue.isEmpty();
-    }
+  @Override
+  public boolean hasNext() {
+    return !queue.isEmpty();
+  }
 
-    @Override
-    public Class getCollectionClass() {
-        return Queue.class;
-    }
+  @Override
+  public Class getCollectionClass() {
+    return Queue.class;
+  }
 }

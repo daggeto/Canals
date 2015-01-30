@@ -1,6 +1,5 @@
 package com.daggeto.canals.domain;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -9,54 +8,50 @@ import java.util.Map;
  */
 public class GraphNode {
 
-    /**
-     * Unique name of node
-     */
-    private String name;
+  /**
+   * Unique name of node
+   */
+  private String name;
 
-    /**
-     * Adjacent nodes mapped with distances
-     */
-    private Map<GraphNode, Integer> adjacentNodes;
+  /**
+   * Adjacent nodes mapped with distances
+   */
+  private Map<GraphNode, Integer> adjacentNodes;
 
-    public GraphNode(String name){
-        this.name = name;
-        this.adjacentNodes = new LinkedHashMap<>();
+  public GraphNode(String name) {
+    this.name = name;
+    this.adjacentNodes = new LinkedHashMap<>();
+  }
+
+  public void addAdjacentNode(GraphNode node, Integer weight) {
+    adjacentNodes.put(node, weight);
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Map<GraphNode, Integer> getAdjacentNodes() {
+    return adjacentNodes;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof GraphNode)) {
+      return false;
     }
 
-    public void addAdjacentNode(GraphNode node, Integer weight){
-        adjacentNodes.put(node, weight);
-    }
+    GraphNode compNode = (GraphNode) obj;
 
-    public String getName() {
-        return name;
-    }
+    return name.equals(compNode.getName());
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Map<GraphNode, Integer> getAdjacentNodes() {
-        return adjacentNodes;
-    }
-
-    public void setAdjacentNodes(Map<GraphNode, Integer> adjacentNodes) {
-        this.adjacentNodes = adjacentNodes;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if( !(obj instanceof GraphNode) ){
-            return false;
-        }
-
-        GraphNode compNode = (GraphNode) obj;
-
-        return name.equals(compNode.getName());
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

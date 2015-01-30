@@ -12,34 +12,33 @@ import java.util.Map;
  */
 public class RecursiveGraphTravelStrategy implements GraphTravelStrategy {
 
-    private NodeVisitor visitor;
+  private NodeVisitor visitor;
 
-    @Override
-    public void travel(GraphNode nodeFrom, NodeVisitor visitListener) {
-        this.visitor = visitListener;
+  @Override
+  public void travel(GraphNode nodeFrom, NodeVisitor visitListener) {
+    this.visitor = visitListener;
 
-        travelRecursively(nodeFrom, null, 0);
+    travelRecursively(nodeFrom, null, 0);
+  }
+
+  private void travelRecursively(GraphNode currentNode, GraphNode parent, int totalWeight) {
+
+    VisitStatus status = visitor.visit(currentNode, parent, totalWeight);
+
+    if (VisitStatus.SKIP.equals(status) || VisitStatus.STOP.equals(status)) {
+      return;
     }
 
-    private void travelRecursively(GraphNode currentNode, GraphNode parent, int totalWeight){
-
-        VisitStatus status = visitor.visit(currentNode, parent, totalWeight);
-
-        if(VisitStatus.SKIP.equals(status) || VisitStatus.STOP.equals(status)){
-            return;
-        }
-
-        Map<GraphNode, Integer> adjacents = currentNode.getAdjacentNodes();
+    Map<GraphNode, Integer> adjacents = currentNode.getAdjacentNodes();
 
 
-        for(GraphNode adjacent : adjacents.keySet()){
-            int weight = adjacents.get(adjacent);
+    for (GraphNode adjacent : adjacents.keySet()) {
+      int weight = adjacents.get(adjacent);
 
-            travelRecursively(adjacent, currentNode, totalWeight + weight);
-        }
-
+      travelRecursively(adjacent, currentNode, totalWeight + weight);
     }
 
+  }
 
 
 }
