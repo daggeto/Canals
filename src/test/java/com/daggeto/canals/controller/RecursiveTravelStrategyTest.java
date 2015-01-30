@@ -1,18 +1,15 @@
 package com.daggeto.canals.controller;
 
-import com.daggeto.AbstractGraphTest;
 import com.daggeto.canals.controller.impl.RecursiveGraphTravelStrategy;
 import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.utils.GraphRelationsBuilder;
 import com.daggeto.canals.visitor.NodeVisitor;
+import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by daggeto on 15.1.27.
- */
-public class RecursiveTravelStrategyTest extends AbstractGraphTest {
+public class RecursiveTravelStrategyTest extends TestCase {
 
   GraphTravelStrategy testObject;
 

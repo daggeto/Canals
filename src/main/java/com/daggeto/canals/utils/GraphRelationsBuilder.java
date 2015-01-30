@@ -7,7 +7,6 @@ import com.daggeto.canals.domain.GraphNode;
  */
 public class GraphRelationsBuilder {
 
-  //TODO: refactor other test to use builder
   GraphNode forNode;
 
   public GraphRelationsBuilder(GraphNode forNode) {

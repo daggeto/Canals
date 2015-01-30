@@ -1,12 +1,12 @@
 package com.daggeto.canals.visitor;
 
-import com.daggeto.AbstractGraphTest;
 import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.visitor.NodeVisitor.VisitStatus;
 import com.daggeto.canals.visitor.impl.AllPathsVisitor;
 import com.google.common.base.Predicate;
+import junit.framework.TestCase;
 
-public class AllPathsVisitorTest extends AbstractGraphTest {
+public class AllPathsVisitorTest extends TestCase {
 
   private final int LIMIT_WEIGHT = 5;
 

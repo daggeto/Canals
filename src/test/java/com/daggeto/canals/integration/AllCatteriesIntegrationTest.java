@@ -1,17 +1,14 @@
 package com.daggeto.canals.integration;
 
-import com.daggeto.AbstractGraphTest;
 import com.daggeto.canals.controller.impl.RecursiveGraphTravelStrategy;
 import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.utils.GraphRelationsBuilder;
 import com.daggeto.canals.visitor.NodeVisitor;
 import com.daggeto.canals.visitor.impl.AllPathsVisitor;
 import com.google.common.base.Predicate;
+import junit.framework.TestCase;
 
-/**
- * Created by daggeto on 15.1.27.
- */
-public class AllCatteriesIntegrationTest extends AbstractGraphTest {
+public class AllCatteriesIntegrationTest extends TestCase {
 
   GraphNode nodeA = new GraphNode("A");
   GraphNode nodeB = new GraphNode("B");

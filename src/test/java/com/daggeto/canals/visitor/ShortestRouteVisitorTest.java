@@ -1,9 +1,9 @@
 package com.daggeto.canals.visitor;
 
-import com.daggeto.AbstractGraphTest;
 import com.daggeto.canals.domain.GraphNode;
 import com.daggeto.canals.utils.GraphRelationsBuilder;
 import com.daggeto.canals.visitor.impl.ShortestRouteVisitor;
+import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static com.daggeto.canals.visitor.NodeVisitor.VisitStatus;
 
-public class ShortestRouteVisitorTest extends AbstractGraphTest {
+public class ShortestRouteVisitorTest extends TestCase {
 
   NodeVisitor<Integer> testObject;
 
